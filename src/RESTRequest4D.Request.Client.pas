@@ -40,6 +40,12 @@ type
     function ResourceSuffix: string; overload;
     function Timeout(const ATimeout: Integer): IRequest; overload;
     function Timeout: Integer; overload;
+    {$IF COMPILERVERSION > 33}
+      function ConnectTimeout: Integer; overload;
+      function ConnectTimeout(const AConnectTimeout: Integer): IRequest; overload;
+      function ReadTimeout: Integer; overload;
+      function ReadTimeout(const AReadTimeout: Integer): IRequest; overload;
+    {$ENDIF}
     function RaiseExceptionOn500: Boolean; overload;
     function RaiseExceptionOn500(const ARaiseException: Boolean): IRequest; overload;
     function FullRequestURL(const AIncludeParams: Boolean = True): string;
@@ -73,6 +79,7 @@ type
     function AddCookies(const ACookies: TStrings): IRequest;
     function AddCookie(const ACookieName, ACookieValue: string): IRequest;
     function AddField(const AFieldName: string; const AValue: string): IRequest; overload;
+    function AddText(const AFieldName: string; const AContent: string; const AContentType: string): IRequest;
     function AddFile(const AFieldName: string; const AFileName: string; const AContentType: TRESTContentType = TRESTContentType.ctNone): IRequest; overload;
     function AddFile(const AFieldName: string; const AValue: TStream; const AFileName: string = ''; const AContentType: TRESTContentType = TRESTContentType.ctNone): IRequest; overload;
     function Proxy(const AServer, APassword, AUsername: string; const APort: Integer): IRequest;
@@ -234,6 +241,14 @@ begin
     Exit;
   FParams.Add(AName);
   FRESTRequest.AddParameter(AName, AValue, AKind, AOptions);
+end;
+
+function TRequestClient.AddText(const AFieldName, AContent: string;
+  const AContentType: string): IRequest;
+begin
+  Result := Self;
+  FRESTRequest.Params.AddItem(AFieldName, AContent, pkREQUESTBODY, [poDoNotEncode]
+  {$IF COMPILERVERSION > 34} , AContentType {$ENDIF} );
 end;
 
 function TRequestClient.AddUrlSegment(const AName, AValue: string): IRequest;
@@ -445,6 +460,30 @@ function TRequestClient.FullRequestURL(const AIncludeParams: Boolean): string;
 begin
   Result := FRESTRequest.GetFullRequestURL(AIncludeParams);
 end;
+
+{$IF COMPILERVERSION > 33}
+function TRequestClient.ReadTimeout: Integer;
+begin
+  Result := FRESTRequest.ReadTimeout;
+end;
+
+function TRequestClient.ReadTimeout(const AReadTimeout: Integer): IRequest;
+begin
+  Result := Self;
+  FRESTRequest.ReadTimeout := AReadTimeout;
+end;
+
+function TRequestClient.ConnectTimeout: Integer;
+begin
+  Result := FRESTRequest.ConnectTimeout;
+end;
+
+function TRequestClient.ConnectTimeout(const AConnectTimeout: Integer): IRequest;
+begin
+  Result := Self;
+  FRESTRequest.ConnectTimeout := AConnectTimeout;
+end;
+{$ENDIF}
 
 function TRequestClient.Resource: string;
 begin

@@ -82,6 +82,7 @@ type
     function AddCookie(const ACookieName, ACookieValue: string): IRequest;
     function AddParam(const AName, AValue: string): IRequest;
     function AddField(const AFieldName: string; const AValue: string): IRequest; overload;
+    function AddText(const AFieldName: string; const AContent: string; const AContentType: string = ''): IRequest;
     function AddFile(const AFieldName: string; const AFileName: string; const AContentType: string = ''): IRequest; overload;
     function AddFile(const AFieldName: string; const AValue: TStream; const AFileName: string = ''; const AContentType: string = ''): IRequest; overload;
     function MakeURL(const AIncludeParams: Boolean = True): string;
@@ -102,7 +103,7 @@ type
 
 implementation
 
-uses RESTRequest4D.Response.Indy, IdURI, IdCookieManager;
+uses RESTRequest4D.Response.Indy, IdURI, IdCookieManager, IdCompressorZLib;
 
 function TRequestIndy.AddField(const AFieldName: string; const AValue: string): IRequest;
 begin
@@ -452,6 +453,15 @@ begin
     FParams.Add(AName + '=' + AValue);
 end;
 
+function TRequestIndy.AddText(const AFieldName, AContent,
+  AContentType: string): IRequest;
+begin
+  Result := Self;
+  {$IF DEFINED(RR4D_INDY)}
+    FIdMultiPartFormDataStream.AddFormField(AFieldName, AContent, EmptyStr, AContentType).ContentTransfer:= '8bit';
+  {$ENDIF}
+end;
+
 function TRequestIndy.AddUrlSegment(const AName, AValue: string): IRequest;
 begin
   Result := Self;
@@ -623,6 +633,9 @@ begin
   FIdHTTP.Request.Connection := 'Keep-Alive';
   FIdHTTP.Request.UserAgent := 'User-Agent:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.96 Safari/537.36';
   FIdHTTP.HandleRedirects := True;
+
+  // Native accepted encoding: gzip, deflate
+  FIdHTTP.Compressor := TIdCompressorZLib.Create(FIdHTTP);
 
   FIdSSLIOHandlerSocketOpenSSL := TIdSSLIOHandlerSocketOpenSSL.Create;
   FIdHTTP.IOHandler := FIdSSLIOHandlerSocketOpenSSL;
