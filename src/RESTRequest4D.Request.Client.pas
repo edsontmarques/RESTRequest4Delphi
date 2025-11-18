@@ -342,7 +342,7 @@ begin
   FHeaders := TStringList.Create;
   FRESTRequest.OnAfterExecute := DoAfterExecute;
   FRESTRequest.OnHTTPProtocolError := DoHTTPProtocolError;
-  {$IFDEF FPC}
+  {$IF COMPILERVERSION >= 33}
   FRESTClient.OnReceiveData := DoReceiveProgress;
   FRESTClient.OnSendData := DoSendProgress;
   {$ENDIF}
