@@ -192,12 +192,17 @@ var
   cookies: TStringList;
 begin
   cookies := TStringList.Create;
+  try
   {$IF COMPILERVERSION <= 28.0}
     cookies.Values[ACookieName] := ACookieValue;
   {$ELSE}
     cookies.AddPair(ACookieName, ACookieValue);
   {$ENDIF}
   Result := AddCookies(cookies);
+  except
+    cookies.Free;
+    raise;
+  end;
 end;
 
 function TRequestIndy.RaiseExceptionOn500: Boolean;
