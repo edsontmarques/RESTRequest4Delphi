@@ -212,8 +212,9 @@ begin
   try
     cookies.AddPair(ACookieName, ACookieValue);
     Result := AddCookies(cookies);
-  finally
+  except
     cookies.Free;
+    raise;
   end;
 end;
 
