@@ -342,7 +342,11 @@ begin
   FHeaders := TStringList.Create;
   FRESTRequest.OnAfterExecute := DoAfterExecute;
   FRESTRequest.OnHTTPProtocolError := DoHTTPProtocolError;
+<<<<<<< HEAD
   {$IF COMPILERVERSION >= 33}
+=======
+  {$IF COMPILERVERSION >= 36}
+>>>>>>> gh_fonte
   FRESTClient.OnReceiveData := DoReceiveProgress;
   FRESTClient.OnSendData := DoSendProgress;
   {$ENDIF}
