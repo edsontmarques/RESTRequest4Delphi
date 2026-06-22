@@ -42,6 +42,8 @@ type
     FCertificatePassword: String;
     FOnBeforeExecute: TRR4DCallbackOnBeforeExecute;
     FOnAfterExecute: TRR4DCallbackOnAfterExecute;
+    FOnReceiveProgress: TRR4DCallbackOnProgress;
+    FOnSendProgress: TRR4DCallbackOnProgress;
     procedure ExecuteRequest(const AMethod: TMethodRequest);
     function AcceptEncoding: string; overload;
     function AcceptEncoding(const AAcceptEncoding: string): IRequest; overload;
@@ -68,6 +70,8 @@ type
     function Retry(const ARetries: Integer): IRequest;
     function OnBeforeExecute(const AOnBeforeExecute: TRR4DCallbackOnBeforeExecute): IRequest;
     function OnAfterExecute(const AOnAfterExecute: TRR4DCallbackOnAfterExecute): IRequest;
+    function OnReceiveProgress(const AOnProgress: TRR4DCallbackOnProgress): IRequest;
+    function OnSendProgress(const AOnProgress: TRR4DCallbackOnProgress): IRequest;
     function Get: IResponse;
     function Post: IResponse;
     function Put: IResponse;
@@ -335,6 +339,18 @@ function TRequestFPHTTPClient.OnAfterExecute(const AOnAfterExecute: TRR4DCallbac
 begin
   Result := Self;
   FOnAfterExecute := AOnAfterExecute;
+end;
+
+function TRequestFPHTTPClient.OnReceiveProgress(const AOnProgress: TRR4DCallbackOnProgress): IRequest;
+begin
+  Result := Self;
+  FOnReceiveProgress := AOnProgress;
+end;
+
+function TRequestFPHTTPClient.OnSendProgress(const AOnProgress: TRR4DCallbackOnProgress): IRequest;
+begin
+  Result := Self;
+  FOnSendProgress := AOnProgress;
 end;
 
 function TRequestFPHTTPClient.Get: IResponse;
