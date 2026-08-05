@@ -277,7 +277,7 @@ begin
       LFileName := AFieldName;
     AValue.Position := 0;
   {$IF COMPILERVERSION >= 34.0}
-    FMultipartFormData.AddStream(AFieldName, AValue, True, LFileName, AContentType);
+    FMultipartFormData.AddStream(AFieldName, AValue, False, LFileName, AContentType);
   {$ELSE}
     FMultipartFormData.AddStream(AFieldName, AValue, LFileName, AContentType);
   {$ENDIF}
