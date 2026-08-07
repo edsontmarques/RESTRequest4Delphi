@@ -74,10 +74,10 @@ var
   I: Integer;
 begin
   Result := '';
-  for I := 0 to Pred(FSslHttpRest.RcvdCookie.Count) do
+  for I := 0 to Pred(FSslHttpRest.RestCookies.Count) do
   begin
-    if Trim(LowerCase(FSslHttpRest.RcvdCookie.Names[I])) = Trim(LowerCase(ACookieName)) then
-      Exit(FSslHttpRest.RcvdCookie.Values[FSslHttpRest.RcvdCookie.Names[I]]);
+    if Trim(LowerCase(FSslHttpRest.RestCookies.Get1Cookie(I).CName)) = Trim(LowerCase(ACookieName)) then
+      Exit(FSslHttpRest.RestCookies.Get1Cookie(I).CValue);
   end;
 end;
 

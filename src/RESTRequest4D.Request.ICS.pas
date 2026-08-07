@@ -81,7 +81,8 @@ type
     function AddCookie(const ACookieName, ACookieValue: string): IRequest;
     function AddFile(const AFileName: string; UploadStrat: THttpUploadStrat): IRequest; overload;
     function AddField(const AFieldName: string; const AValue: string): IRequest; overload;
-    function Proxy(const AServer, APassword, AUsername: string; const APort: Integer): IRequest;
+    function AddFieldFormData(const AFieldName: string; const AValue: string): IRequest;
+    function AddFieldXWwwForm(const AFieldName: string; const AValue: string): IRequest;    function Proxy(const AServer, APassword, AUsername: string; const APort: Integer): IRequest;
     function DeactivateProxy: IRequest;
     function CertFile(const APath: string): IRequest;
     function KeyFile(const APath: string): IRequest;
@@ -101,7 +102,7 @@ type
 
 implementation
 
-uses RESTRequest4D.Response.ICS, System.SysUtils, REST.JSON, RESTRequest4D.Utils;
+uses RESTRequest4D.Response.ICS, System.SysUtils, REST.JSON;
 
 function TRequestICS.OnBeforeExecute(const AOnBeforeExecute: TRR4DCallbackOnBeforeExecute): IRequest;
 begin
@@ -192,6 +193,18 @@ begin
   Result := Self;
   FSslHttpRest.RestParams.AddItem(AFieldName, AValue);
   FSslHttpRest.RestParams.PContent := PContUrlencoded;
+end;
+
+function TRequestICS.AddFieldFormData(const AFieldName, AValue: string): IRequest;
+begin
+  Result := Self;
+  FSslHttpRest.RestParams.AddItem(AFieldName, AValue);
+end;
+
+function TRequestICS.AddFieldXWwwForm(const AFieldName, AValue: string): IRequest;
+begin
+  Result := Self;
+  Result.AddField(AFieldName, AValue);
 end;
 
 function TRequestICS.AddFile(const AFileName: string; UploadStrat: THttpUploadStrat): IRequest;
