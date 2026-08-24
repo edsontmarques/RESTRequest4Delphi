@@ -9,6 +9,7 @@ uses System.Net.Mime, System.Net.HttpClientComponent, System.Net.HttpClient, RES
 type
   TRequestNetHTTP = class(TInterfacedObject, IRequest)
   private
+    FXWwwFormData: TStringList;
     FUseMultipartFormData: Boolean;
     FMultipartFormData: TMultipartFormData;
     FParams: TStrings;
@@ -83,7 +84,9 @@ type
     function AddCookies(const ACookies: TStrings): IRequest;
     function AddCookie(const ACookieName, ACookieValue: string): IRequest;
     function AddParam(const AName, AValue: string): IRequest;
-    function AddField(const AFieldName: string; const AValue: string): IRequest; overload;
+    function AddField(const AFieldName: string; const AValue: string): IRequest;
+    function AddFieldFormData(const AFieldName: string; const AValue: string): IRequest;
+    function AddFieldXWwwForm(const AFieldName: string; const AValue: string): IRequest;
     function AddText(const AFieldName: string; const AContent: string; const AContentType: string): IRequest;
     function AddFile(const AFieldName: string; const AFileName: string; const AContentType: string = ''): IRequest; overload;
     function AddFile(const AFieldName: string; const AValue: TStream; const AFileName: string = ''; const AContentType: string = ''): IRequest; overload;
@@ -108,6 +111,21 @@ type
   end;
 
 implementation
+
+function TRequestNetHTTP.AddFieldFormData(const AFieldName, AValue: string): IRequest;
+begin
+  Result := Self;
+  FMultipartFormData.AddField(AFieldName, AValue);
+  FUseMultipartFormData := True;
+end;
+
+function TRequestNetHTTP.AddFieldXWwwForm(const AFieldName, AValue: string): IRequest;
+begin
+  Result := Self;
+  if not Assigned(FXWwwFormData) then
+    FXWwwFormData := TStringList.Create;
+  FXWwwFormData.Add(Format('%s=%s', [AFieldName, AValue]));
+end;
 
 function TRequestNetHTTP.Accept(const AAccept: string): IRequest;
 begin
@@ -258,8 +276,8 @@ begin
     if (LFileName = EmptyStr) then
       LFileName := AFieldName;
     AValue.Position := 0;
-  {$IF (COMPILERVERSION >= 34.0) and (COMPILERVERSION < 35.0)}
-    FMultipartFormData.AddStream(AFieldName, AValue, True, LFileName, AContentType);
+  {$IF COMPILERVERSION >= 34.0}
+    FMultipartFormData.AddStream(AFieldName, AValue, False, LFileName, AContentType);
   {$ELSE}
     FMultipartFormData.AddStream(AFieldName, AValue, LFileName, AContentType);
   {$ENDIF}
@@ -443,6 +461,8 @@ begin
     FStreamResult.Free;
   if Assigned(FMultipartFormData) then
     FMultipartFormData.Free;
+  if Assigned(FXWwwFormData) then
+    FXWwwFormData.Free;
   inherited;
 end;
 
@@ -516,6 +536,8 @@ begin
             FUseMultipartFormData := False;
             Result := FNetHTTPClient.Post(TIdURI.URLEncode(MakeURL), FMultipartFormData, FStreamResult);
           end
+          else if Assigned(FXWwwFormData) then
+            Result := FNetHTTPClient.Post(TIdURI.URLEncode(MakeURL), FXWwwFormData, FStreamResult)
           else
             Result := FNetHTTPClient.Post(TIdURI.URLEncode(MakeURL), FStreamSend, FStreamResult);
         end;
@@ -529,6 +551,8 @@ begin
               Result := FNetHTTPClient.Put(TIdURI.URLEncode(MakeURL), FMultipartFormData, FStreamResult);
             {$ENDIF}
           end
+          else if Assigned(FXWwwFormData) then
+            Result := FNetHTTPClient.Put(TIdURI.URLEncode(MakeURL), FXWwwFormData, FStreamResult)
           else
             Result := FNetHTTPClient.Put(TIdURI.URLEncode(MakeURL), FStreamSend, FStreamResult);
         end;

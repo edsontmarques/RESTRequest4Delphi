@@ -108,7 +108,7 @@ begin
   lblRESTRequest4DelphiComponent.Caption := 'RESTRequest4Delphi:  RR4D_FPHTTPCLIENT';
 {$ELSEIF DEFINED(RR4D_INDY)}
   lblRESTRequest4DelphiComponent.Caption := 'RESTRequest4Delphi:  RR4D_INDY';
-  btnHEAD.Enable := True;
+  btnHEAD.Enabled := True;
 {$ELSEIF DEFINED(RR4D_NETHTTP)}
   lblRESTRequest4DelphiComponent.Caption := 'RESTRequest4Delphi:  RR4D_NETHTTP';
 {$ELSEIF DEFINED(RR4D_SYNAPSE)}
