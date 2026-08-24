@@ -87,7 +87,9 @@ type
     function UserAgent(const AName: string): IRequest;
     function AddCookies(const ACookies: TStrings): IRequest;
     function AddCookie(const ACookieName, ACookieValue: string): IRequest;
-    function AddField(const AFieldName: string; const AValue: string): IRequest; overload;
+    function AddField(const AFieldName: string; const AValue: string): IRequest;
+    function AddFieldFormData(const AFieldName: string; const AValue: string): IRequest;
+    function AddFieldXWwwForm(const AFieldName: string; const AValue: string): IRequest;
     function AddText(const AFieldName: string; const AContent: string; const AContentType: string): IRequest;
     function AddFile(const AFieldName: string; const AFileName: string; const AContentType: TRESTContentType = TRESTContentType.ctNone): IRequest; overload;
     function AddFile(const AFieldName: string; const AValue: TStream; const AFileName: string = ''; const AContentType: TRESTContentType = TRESTContentType.ctNone): IRequest; overload;
@@ -197,6 +199,29 @@ begin
   FRESTRequest.Params.AddItem(AFieldName, AValue);
 end;
 
+function TRequestClient.AddFieldFormData(const AFieldName, AValue: string): IRequest;
+begin
+  Result := Self;
+  with FRESTRequest.Params.AddItem do
+  begin
+    Name := AFieldName;
+    Value := AValue;
+    Kind := TRESTRequestParameterKind.pkREQUESTBODY;
+  end;
+end;
+
+function TRequestClient.AddFieldXWwwForm(const AFieldName, AValue: string): IRequest;
+begin
+  Result := Self;
+  with FRESTRequest.Params.AddItem do
+  begin
+    Name := AFieldName;
+    Value := AValue;
+    Kind := TRESTRequestParameterKind.pkGETorPOST;
+    ContentType := TRESTContentType.ctAPPLICATION_X_WWW_FORM_URLENCODED;
+  end;
+end;
+
 function TRequestClient.AddFile(const AFieldName: string; const AFileName: string; const AContentType: TRESTContentType): IRequest;
 begin
   Result := Self;
@@ -261,7 +286,7 @@ function TRequestClient.AddText(const AFieldName, AContent: string;
 begin
   Result := Self;
   FRESTRequest.Params.AddItem(AFieldName, AContent, pkREQUESTBODY, [poDoNotEncode]
-  {$IF COMPILERVERSION > 34} , AContentType {$ENDIF} );
+  {$IF COMPILERVERSION > 34}, AContentType {$ENDIF});
 end;
 
 function TRequestClient.AddUrlSegment(const AName, AValue: string): IRequest;
