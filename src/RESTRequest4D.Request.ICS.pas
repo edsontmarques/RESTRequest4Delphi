@@ -82,7 +82,8 @@ type
     function AddFile(const AFileName: string; UploadStrat: THttpUploadStrat): IRequest; overload;
     function AddField(const AFieldName: string; const AValue: string): IRequest; overload;
     function AddFieldFormData(const AFieldName: string; const AValue: string): IRequest;
-    function AddFieldXWwwForm(const AFieldName: string; const AValue: string): IRequest;    function Proxy(const AServer, APassword, AUsername: string; const APort: Integer): IRequest;
+    function AddFieldXWwwForm(const AFieldName: string; const AValue: string): IRequest;
+    function Proxy(const AServer, APassword, AUsername: string; const APort: Integer): IRequest;
     function DeactivateProxy: IRequest;
     function CertFile(const APath: string): IRequest;
     function KeyFile(const APath: string): IRequest;
@@ -175,16 +176,12 @@ var
   I: Integer;
 begin
   Result := Self;
-  try
-    for I := 0 to Pred(ACookies.Count) do
-    begin
-      if FSslHttpRest.Cookie.Trim.IsEmpty then
-        FSslHttpRest.Cookie := ACookies.Names[I] + '=' + ACookies.Values[ACookies.Names[I]]
-      else
-        FSslHttpRest.Cookie := FSslHttpRest.Cookie + '; ' + ACookies.Names[I] + '=' + ACookies.Values[ACookies.Names[I]];
-    end;
-  finally
-    ACookies.Free;
+  for I := 0 to Pred(ACookies.Count) do
+  begin
+    if FSslHttpRest.Cookie.Trim.IsEmpty then
+      FSslHttpRest.Cookie := ACookies.Names[I] + '=' + ACookies.Values[ACookies.Names[I]]
+    else
+      FSslHttpRest.Cookie := FSslHttpRest.Cookie + '; ' + ACookies.Names[I] + '=' + ACookies.Values[ACookies.Names[I]];
   end;
 end;
 
